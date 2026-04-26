@@ -67,4 +67,5 @@ def predict_diabetes_risk(payload):
         "risk_label": risk_label,
         "probability": round(probability, 4),
         "message": message,
+        "model_version": "logistic-regression-v1",
     }

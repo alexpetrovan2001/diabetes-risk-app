@@ -3,7 +3,15 @@ from sqlalchemy.orm import Session
 
 from app.db.models import PredictionRecord
 from app.db.session import get_db
-from app.schemas.prediction import PredictionRequest, PredictionResponse
+from app.rag.rag_service import answer_question, explain_prediction
+from app.schemas.prediction import (
+    AskRequest,
+    AskResponse,
+    ExplainRequest,
+    ExplainResponse,
+    PredictionRequest,
+    PredictionResponse,
+)
 from app.services.prediction_service import predict_diabetes_risk
 
 router = APIRouter()
@@ -64,7 +72,7 @@ def predict(payload: PredictionRequest, db: Session = Depends(get_db)):
         risk_label=response.risk_label,
         probability=response.probability,
         message=response.message,
-        model_version="logistic-regression-v1",
+        model_version=result["model_version"],
     )
 
     db.add(record)
@@ -72,3 +80,26 @@ def predict(payload: PredictionRequest, db: Session = Depends(get_db)):
     db.refresh(record)
 
     return response
+
+
+@router.post("/explain", response_model=ExplainResponse)
+def explain(payload: ExplainRequest):
+    explanation = explain_prediction(
+        risk_label=payload.risk_label,
+        probability=payload.probability,
+        glucose=payload.glucose,
+        bmi=payload.bmi,
+        age=payload.age,
+        pregnancies=payload.pregnancies,
+        blood_pressure=payload.blood_pressure,
+        skin_thickness=payload.skin_thickness,
+        insulin=payload.insulin,
+        diabetes_pedigree_function=payload.diabetes_pedigree_function,
+    )
+    return ExplainResponse(explanation=explanation)
+
+
+@router.post("/ask", response_model=AskResponse)
+def ask(payload: AskRequest):
+    answer = answer_question(payload.question)
+    return AskResponse(answer=answer)

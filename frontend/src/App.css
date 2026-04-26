@@ -321,4 +321,107 @@ tbody tr:hover {
   .result-stats {
     grid-template-columns: 1fr;
   }
+
+  .qa-form {
+    flex-direction: column;
+  }
+
+  .qa-button {
+    width: 100%;
+  }
+}
+
+/* RAG explanation */
+.explanation-box {
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+  border: 1px solid #c7d2fe;
+}
+
+.explanation-box span {
+  display: block;
+  margin-bottom: 8px;
+  color: #4338ca;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.explanation-box p {
+  margin: 0;
+  color: #1e1b4b;
+  line-height: 1.65;
+}
+
+.explanation-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 2px solid #e2e8f0;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Q&A section */
+.qa-card {
+  margin-bottom: 24px;
+}
+
+.qa-card .explanation-loading,
+.qa-card .explanation-box {
+  margin-top: 20px;
+}
+
+.qa-form {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.qa-input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  font-size: 0.96rem;
+  font-family: inherit;
+  resize: vertical;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.qa-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.qa-button {
+  white-space: nowrap;
+  padding: 12px 24px;
+  grid-column: unset;
 }

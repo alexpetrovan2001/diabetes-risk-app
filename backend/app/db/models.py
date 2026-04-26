@@ -20,5 +20,5 @@ class PredictionRecord(Base):
     risk_label = Column(String, nullable=False)
     probability = Column(Float, nullable=False)
     message = Column(String, nullable=False)
-    model_version = Column(String, nullable=False, default="v1-placeholder")
+    model_version = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

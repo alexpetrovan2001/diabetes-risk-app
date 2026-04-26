@@ -17,3 +17,29 @@ class PredictionResponse(BaseModel):
     risk_label: str
     probability: float
     message: str
+
+
+class ExplainRequest(BaseModel):
+    prediction: int
+    risk_label: str
+    probability: float
+    pregnancies: int
+    glucose: int
+    blood_pressure: int
+    skin_thickness: int
+    insulin: int
+    bmi: float
+    diabetes_pedigree_function: float
+    age: int
+
+
+class ExplainResponse(BaseModel):
+    explanation: str
+
+
+class AskRequest(BaseModel):
+    question: str = Field(..., min_length=3, max_length=500)
+
+
+class AskResponse(BaseModel):
+    answer: str

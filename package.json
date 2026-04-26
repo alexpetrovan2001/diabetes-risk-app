@@ -1,0 +1,18 @@
+{
+  "name": "diabetes-risk-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Intelligent diabetes risk prediction system using ML and RAG",
+  "scripts": {
+    "start": "concurrently --kill-others-on-fail --names \"UI,API\" --prefix-colors \"blue.bold,green.bold\" \"npm --prefix frontend run dev\" \"npm run start:backend\"",
+    "start:frontend": "npm --prefix frontend run dev",
+    "start:backend": "cd backend && .venv\\Scripts\\uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
+    "test:backend": "cd backend && .venv\\Scripts\\python.exe -m pytest tests/ -v",
+    "ingest": "backend\\.venv\\Scripts\\python.exe backend/app/rag/ingest.py",
+    "train": "backend\\.venv\\Scripts\\python.exe ml/train_model.py"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
+

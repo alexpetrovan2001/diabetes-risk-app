@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
+const API_BASE = "http://127.0.0.1:8000";
+
 const initialForm = {
   pregnancies: 0,
   glucose: 120,
@@ -29,10 +31,15 @@ function App() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [explanation, setExplanation] = useState(null);
+  const [explanationLoading, setExplanationLoading] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState(null);
+  const [answerLoading, setAnswerLoading] = useState(false);
 
   const fetchHistory = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/predictions");
+      const response = await axios.get(`${API_BASE}/predictions`);
       setHistory(response.data);
     } catch (error) {
       console.error("Failed to fetch history:", error);
@@ -59,17 +66,53 @@ function App() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/predict",
+        `${API_BASE}/predict`,
         formData,
       );
 
       setResult(response.data);
       await fetchHistory();
+      fetchExplanation(response.data, formData);
     } catch (error) {
       console.error("Prediction request failed:", error);
       alert("Prediction request failed. Please verify the input values.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchExplanation = async (predResult, inputs) => {
+    setExplanationLoading(true);
+    setExplanation(null);
+    try {
+      const response = await axios.post(`${API_BASE}/explain`, {
+        prediction: predResult.prediction,
+        risk_label: predResult.risk_label,
+        probability: predResult.probability,
+        ...inputs,
+      });
+      setExplanation(response.data.explanation);
+    } catch (error) {
+      console.error("Explanation request failed:", error);
+    } finally {
+      setExplanationLoading(false);
+    }
+  };
+
+  const handleAsk = async (event) => {
+    event.preventDefault();
+    if (!question.trim()) return;
+    setAnswerLoading(true);
+    setAnswer(null);
+    try {
+      const response = await axios.post(`${API_BASE}/ask`, {
+        question: question.trim(),
+      });
+      setAnswer(response.data.answer);
+    } catch (error) {
+      console.error("Ask request failed:", error);
+    } finally {
+      setAnswerLoading(false);
     }
   };
 
@@ -161,6 +204,20 @@ function App() {
                   <span>Interpretation</span>
                   <p>{result.message}</p>
                 </div>
+
+                {explanationLoading && (
+                  <div className="explanation-loading">
+                    <div className="spinner" />
+                    <span>Generating AI explanation…</span>
+                  </div>
+                )}
+
+                {explanation && (
+                  <div className="explanation-box">
+                    <span>AI Explanation</span>
+                    <p>{explanation}</p>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="empty-state">
@@ -169,6 +226,45 @@ function App() {
             )}
           </section>
         </main>
+
+        <section className="card qa-card">
+          <div className="card-header">
+            <h2>Ask a Question</h2>
+            <p>Ask anything about diabetes risk factors, symptoms, or prevention.</p>
+          </div>
+
+          <form onSubmit={handleAsk} className="qa-form">
+            <textarea
+              className="qa-input"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="e.g. What does a high glucose level mean for diabetes risk?"
+              rows={3}
+              maxLength={500}
+            />
+            <button
+              type="submit"
+              className="primary-button qa-button"
+              disabled={answerLoading || !question.trim()}
+            >
+              {answerLoading ? "Thinking…" : "Ask"}
+            </button>
+          </form>
+
+          {answerLoading && (
+            <div className="explanation-loading">
+              <div className="spinner" />
+              <span>Retrieving answer…</span>
+            </div>
+          )}
+
+          {answer && (
+            <div className="explanation-box">
+              <span>Answer</span>
+              <p>{answer}</p>
+            </div>
+          )}
+        </section>
 
         <section className="card history-card">
           <div className="card-header">
